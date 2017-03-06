@@ -56,18 +56,19 @@ public class AuxiliaryInjectTransform extends Transform {
     }
 
     /**
-     * Returns the type(s) of data that is consumed by the Transform. This may be more than
-     * one type.
+     * 定义了处理文件的类型
      *
      * <strong>This must be of type {@link QualifiedContent.DefaultContentType}</strong>
      */
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
-        return ImmutableSet.of(QualifiedContent.DefaultContentType.CLASSES)
+        return ImmutableSet.of(
+                QualifiedContent.DefaultContentType.CLASSES,
+                QualifiedContent.DefaultContentType.RESOURCES)
     }
 
     /**
-     * Returns the scope(s) of the Transform. This indicates which scopes the transform consumes.
+     * 定义了处理内容范围
      */
     @Override
     Set<QualifiedContent.Scope> getScopes() {
@@ -81,11 +82,7 @@ public class AuxiliaryInjectTransform extends Transform {
     }
 
     /**
-     * Returns whether the Transform can perform incremental work.
-     *
-     * <p/>
-     * If it does, then the TransformInput may contain a list of changed/removed/added files, unless
-     * something else triggers a non incremental run.
+     * 是否支持增量更新
      */
     @Override
     boolean isIncremental() {
@@ -153,7 +150,6 @@ public class AuxiliaryInjectTransform extends Transform {
 
     @Override
     public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
-        printMsgLog("Inject is %b, incremental is %b", isEnabled, transformInvocation.incremental)
 
         // 获取完整的transform名字 e.g. sample:transformClassesWithAuxiliaryInjectForRelease
         // 再自己组装出部分transform名字 e.g. transformClassesWithAuxiliaryInjectFor
@@ -234,7 +230,6 @@ public class AuxiliaryInjectTransform extends Transform {
                                     printMsgLog('Removing %s file %s from result.', fileStatus,
                                             dirOutput.toPath().relativize(fileOutput.toPath()).toString())
                                 }
-
                                 if (fileOutput.exists()) {
                                     if (fileOutput.isDirectory()) {
                                         fileOutput.deleteDir()

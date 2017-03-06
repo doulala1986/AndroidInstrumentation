@@ -40,17 +40,15 @@ public class MainActivity extends Activity  implements View.OnClickListener{
     private static final Uri DOCS_URI = Uri.parse(
             "http://developer.android.com/design/building-blocks/buttons.html#borderless");
 
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.sample_main);
-        findViewById(R.id.cancel_button).setOnClickListener(this);
-//        findViewById(R.id.ok_button).setOnClickListener(this);
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
     public void onClick(View view)
     {
-
         finish();
     }
 }

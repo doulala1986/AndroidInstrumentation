@@ -1,4 +1,6 @@
-package com.ctsi.asm.plugin.agent;
+package com.ctsi.asm.plugin.agent.methodvisitor;
+
+import com.ctsi.asm.plugin.agent.ClassInfo;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -19,7 +21,6 @@ public class OnClickMethodVisitor extends MethodVisitor {
         this.classInfo = classInfo;
         this.method = method;
     }
-
     /**
      * 在方法执行前添加字节码命令
      */
@@ -27,25 +28,10 @@ public class OnClickMethodVisitor extends MethodVisitor {
     public void visitCode() {
         super.visitCode();
         System.out.println("in methodvisitor visitcode");
-//        super.visitMethodInsn(Opcodes.INVOKESTATIC, "com/ctsi/android/instrumentation/AopInteceptor", "before", "()V", false);
-//        Label l0 = new Label();
-//        visitLabel(l0);
-//        visitLdcInsn("aop");
-//        visitLdcInsn("456");
-//        visitMethodInsn(Opcodes.INVOKESTATIC, "android/util/Log", "e", "(Ljava/lang/String;Ljava/lang/String;)I", false);
-//        visitInsn(Opcodes.POP);
-//        visitEnd();
-
         Label l0 = new Label();
         mv.visitLabel(l0);
         mv.visitLdcInsn("aop");
         mv.visitLdcInsn("456");
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, "android/util/Log", "e", "(Ljava/lang/String;Ljava/lang/String;)I", false);
-        mv.visitInsn(Opcodes.POP);
-        Label l1 = new Label();
-        mv.visitLabel(l1);
-        mv.visitLdcInsn("aop");
-        mv.visitLdcInsn("789");
         mv.visitMethodInsn(Opcodes.INVOKESTATIC, "android/util/Log", "e", "(Ljava/lang/String;Ljava/lang/String;)I", false);
         mv.visitInsn(Opcodes.POP);
         Label l3 = new Label();
@@ -53,22 +39,30 @@ public class OnClickMethodVisitor extends MethodVisitor {
         mv.visitEnd();
     }
 
+    @Override
+    public void visitInsn(int opcode) {
+        // 在方法末尾处插入代码
+        if (opcode == Opcodes.RETURN) {
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitLdcInsn("aop");
+            mv.visitLdcInsn("789");
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "android/util/Log", "e", "(Ljava/lang/String;Ljava/lang/String;)I", false);
+            mv.visitInsn(Opcodes.POP);
+        }
+        super.visitInsn(opcode);
+    }
+
     /**
      *
+     *  指定本地变量表与操作数栈的大小
      *  z注意 如果visitMaxs设置的不合适，可能会造成以下错误：
-     *
      *  Uncaught translation error: com.android.dx.cf.code.SimException: stack: overflow
-     * @param maxStack
-     * @param maxLocals
      */
     @Override
     public void visitMaxs(int maxStack, int maxLocals) {
-//        if (maxStack < 1) {
-//            maxStack = 1;
-//        }
-//        if (maxLocals < 1) {
-//            maxLocals = 1;
-//        }
-        super.visitMaxs(100, 100);
+        super.visitMaxs(maxStack+100, maxLocals+100);
     }
+
+
 }

@@ -1,6 +1,7 @@
 package com.ctsi.asm.plugin;
 
-import com.ctsi.asm.plugin.agent.AuxiliaryClassInjectAdapter;
+import com.ctsi.asm.plugin.agent.classvisitor.ActivityClassVisitor;
+import com.ctsi.asm.plugin.agent.classvisitor.AuxiliaryClassInjectAdapter;
 import com.ctsi.asm.plugin.ziputils.Streams;
 
 import org.objectweb.asm.ClassReader;
@@ -32,19 +33,17 @@ public class AuxiliaryClassInjector {
 
     public interface ProcessJarCallback {
         boolean onProcessClassEntry(String entryName);
+
     }
 
     public static void processClass(File classIn, File classOut) throws IOException {
-//        System.out.println("processClass:"+classIn.getAbsolutePath());
-
-
+        System.out.println("output classes:"+classOut.getAbsolutePath());
         InputStream is = null;
         OutputStream os = null;
         try {
             is = new BufferedInputStream(new FileInputStream(classIn));
             os = new BufferedOutputStream(new FileOutputStream(classOut));
             processClass(is, os);
-//            System.out.println("outputNewClass:"+classOut.getAbsolutePath());
         } finally {
             closeQuietly(os);
             closeQuietly(is);
@@ -61,7 +60,7 @@ public class AuxiliaryClassInjector {
     private static void processClass(InputStream classIn, OutputStream classOut) throws IOException {
         ClassReader cr = new ClassReader(classIn);
         ClassWriter cw = new ClassWriter(0);
-        AuxiliaryClassInjectAdapter aia = new AuxiliaryClassInjectAdapter(NOT_EXISTS_CLASSNAME, cw);
+        AuxiliaryClassInjectAdapter aia = new ActivityClassVisitor(NOT_EXISTS_CLASSNAME, cw);
         cr.accept(aia, 0);
         classOut.write(cw.toByteArray());
         classOut.flush();

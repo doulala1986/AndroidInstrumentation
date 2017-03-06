@@ -16,9 +16,12 @@ public class AsmPlugin implements Plugin<Project> {
          */
         boolean isApp = project.getPlugins().hasPlugin(AppPlugin.class);
         if (isApp) {
+
             AppExtension  android = project.getExtensions().getByType(AppExtension.class);
+
             AuxiliaryInjectTransform transform = new AuxiliaryInjectTransform(project);
-            android.registerTransform(transform);
+
+            android.registerTransform(transform);//注册transform后就可以对编译-打包之间的切面进行处理了。
 
         }
     }
